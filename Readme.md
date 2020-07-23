@@ -1,4 +1,4 @@
-## Blackhole
+## blackhole
 
 The name of the application comes from the need that lead me to write
 the tool. Basically is the name of a challenge of the Misc section of
