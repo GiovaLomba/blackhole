@@ -32,7 +32,7 @@ the output is met or not.
 
 positional arguments:
   wordlist              The wordlist file.
-  command               The command with its arguments [% indicates password
+  command               The command and its arguments [%% indicates password
                         position].
   pattern               The pattern in the output indicating the command
                         succeeded.
