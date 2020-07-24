@@ -2,7 +2,8 @@
 
 The name of the tool comes from the need that lead me to write it. 
 Basically `blackhole` is the name of a challenge in the `Misc` 
-section of the very famous CTF web platform hackthebox.eu. 
+section of the very famous CTF web platform [hackthebox.eu](hackthebox.eu) 
+whose flag resonated very well with my feelings of the time. 
 
 #### Purpose
 
