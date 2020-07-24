@@ -1,8 +1,8 @@
 ## blackhole
 
-The name of the tool comes from the need that lead me to write
-the tool. Basically is the name of a challenge of the Misc section of
-the famous Hack The Box CTF web platform. 
+The name of the tool comes from the need that lead me to write it. 
+Basically `blackhole` is the name of a challenge in the `Misc` 
+section of the very famous CTF web platform hackthebox.eu. 
 
 #### Purpose
 
