@@ -1,9 +1,10 @@
 """
 It runs a command against a given word list file until
-a certain pattern in the output is met or not.
+a given pattern is emitted and found on standard output.
 """
 
 from argparse import ArgumentParser, Namespace
+from colorama import Fore, Style, AnsiToWin32, init as colorama_init
 from logging import NOTSET, INFO, WARNING, ERROR, DEBUG
 from logging import getLogRecordFactory, setLogRecordFactory, basicConfig, getLogger, LogRecord
 from multiprocessing import Pool, RLock, cpu_count
@@ -19,7 +20,6 @@ from timeit import timeit
 from types import FrameType
 from typing import Any, Dict, List, Optional as Opt
 
-from colorama import Fore, Style, AnsiToWin32, init as colorama_init
 
 major = 1
 minor = 0
@@ -136,9 +136,11 @@ def version() -> str:
 
 def init_workers(command: List[str], pattern: str) -> None:
     """
-    For each process it is assigned to as process initialization procedure
-    it creates on the global pool_objects dictionary a key whose value is
-    the current process pid containing the given command and pattern.
+    This routing serves as initialization procedure for processes owned
+    by a process pool. It creates on the global variable pool_objects a
+    key whose corresponding value is the PID of the current process that
+    will execute the given command looking in its ouptut for the given
+    pattern.
 
     :param command:     The command along with its arguments.
     :type command:      List[str].
@@ -146,7 +148,8 @@ def init_workers(command: List[str], pattern: str) -> None:
     :param pattern:     The pattern to look for.
     :type pattern:      str.
 
-    :return: None
+    :return: None.
+    :rtype: None.
     """
 
     global pool_objects
@@ -160,7 +163,8 @@ def init_workers(command: List[str], pattern: str) -> None:
 
 def sigint_handler(signum: int, frame: FrameType) -> None:
     """
-    The handler registered for SIGINT signal handling. It terminates the application.
+    The handler registered for SIGINT signal handling.
+    It terminates the application.
 
     :param signum:  The signal to be handled.
     :type signum:   int.
@@ -180,12 +184,12 @@ def sigint_handler(signum: int, frame: FrameType) -> None:
 
 def can_perform(performer):
     """
-    It tells if the given performer can perform on the current environment.
+    It tells whether the given performer can be executed on the current environment.
 
     :param performer:	The performer.
     :type performer: 	str.
 
-    :return: Whether or not the given performer can perform on the current environment.
+    :return: Whether or not the given performer can be run on the current environment.
     :rtype: bool.
     """
     logger = getLogger(__name__)
@@ -198,35 +202,37 @@ def can_perform(performer):
     return False
 
 
-def perform(secret: str, master_pid: int) -> None:
+def perform(row: str, master_pid: int) -> None:
     """
-    It performs the command using the given secret as value for the placeholder.
+    It performs the command using the given row as value for the placeholder.
 
-    :param secret:      The password guess.
-    :type secret:       str.
+    :param row:         The row to inject as parameter for the command.
+    :type row:          str.
 
     :param master_pid:  The pid of the master process.
     :type master_pid:   int.
 
     :return: None.
+    :rtype: None.
     """
     global pool_objects
     obj = pool_objects[getpid()]
     logger = getLogger(__name__)
-    cmd = ' '.join(obj['command']).replace('%%', f'{secret}').split()
+    cmd = ' '.join(obj['command']).replace('%%', f'{row}').split()
     ret = run(cmd, stdout=PIPE, stderr=STDOUT)
 
     if len(findall(obj['pattern'], str(ret.stdout))) > 0 and ret.check_returncode():
         with screen_lock:
-            logger.info('\n** FOUND **: \'{0}\''.format(secret))
+            logger.info('\n** FOUND **: \'{0}\''.format(row))
             stdout.flush()
             kill(master_pid, SIGINT)
 
 
 def usage(args: List[str]) -> Namespace:
     """
-    It parses the given args (usually from sys.argv) and checks they conform to the rules of the application. It then
-    returns a namedtuple with a field for a any given or defaulted argument.
+    It parses the given args (usually from sys.argv) and checks they
+    conform to the rules defined by the argument parser. Then it returns
+    a namedtuple having a field for a any given or defaulted argument.
 
     :param args:    The command line arguments to be parsed.
     :type args:     List[str].
@@ -239,7 +245,8 @@ def usage(args: List[str]) -> Namespace:
         wordlist='The wordlist file.',
         command='The command with its arguments [%% indicates password position].',
         pattern='The pattern in the output indicating the command succeeded.',
-        processors='The number of processes to spawn simultaneously.'
+        processors='The number of processes to spawn simultaneously.',
+        encoding='The encoding the wordlist is encoded with.'
     )
 
     logger = getLogger(__name__)
@@ -248,6 +255,7 @@ def usage(args: List[str]) -> Namespace:
     parser.add_argument('command', nargs='+', help=helps['command'])
     parser.add_argument('pattern', help=helps['pattern'])
     parser.add_argument('-p', '--processors', type=int, dest='p', default=cpu_count(), help=helps['processors'])
+    parser.add_argument('-e', '--encoding', type=str, dest='e', default='utf-8', help=helps['encoding'])
 
     args = parser.parse_args(args)
 
@@ -307,7 +315,7 @@ def main(args: Namespace) -> None:
         )
 
         master_pid = getpid()
-        with open(str(args.wordlist), 'r', errors='ignore') as f:
+        with open(str(args.wordlist), 'r', errors='ignore', encoding=args.e) as f:
             for index, line in enumerate(f):
                 logger.info(f'{index:_>10}:{line[:-1]}')
                 r = pool.apply_async(
