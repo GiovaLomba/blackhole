@@ -61,8 +61,8 @@ class LoggingRecordFactoryColorama:
 
     def __call__(self, *args: Any, **kwargs: Any) -> LogRecord:
         """
-        It adds the color_attr and reset_attr attribute'values  according to the given levels_map, to the kwargs of the
-        record built and returned by the existing_factory, and returns it to the caller.
+        It adds the color_attr and reset_attr attribute's values  according to the given levels_map, to the kwargs of
+        the record built and returned by the existing_factory, and returns it to the caller.
 
         :param args:    The positional args to pass to the existing_factory.
         :type args:     Any.
@@ -139,7 +139,7 @@ def init_workers(command: List[str], pattern: str) -> None:
     This routing serves as initialization procedure for processes owned
     by a process pool. It creates on the global variable pool_objects a
     key whose corresponding value is the PID of the current process that
-    will execute the given command looking in its ouptut for the given
+    will execute the given command looking in its output for the given
     pattern.
 
     :param command:     The command along with its arguments.
@@ -157,7 +157,7 @@ def init_workers(command: List[str], pattern: str) -> None:
     logging_console_init()
     pool_objects[getpid()] = dict(
         command=command,
-        pattern=re_compile(pattern, DOTALL|MULTILINE)
+        pattern=re_compile(pattern, DOTALL | MULTILINE)
     )
 
 
@@ -175,10 +175,11 @@ def sigint_handler(signum: int, frame: FrameType) -> None:
     :return: See description.
     """
     global screen_lock
+    logger = getLogger(__name__)
 
     with screen_lock:
-        getLogger(__name__).info('Interrupt received.')
-        signum, frame = frame, signum
+        logger.info(f'Interrupt received: {signum}.')
+        logger.info(f'{frame}')
         exit(0)
 
 
