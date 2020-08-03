@@ -1,8 +1,13 @@
 <component name="ProjectDictionaryState">
   <dictionary name="tvbin">
     <words>
+      <w>asctime</w>
       <w>blackhole</w>
       <w>colorama</w>
+      <w>datefmt</w>
+      <w>levelname</w>
+      <w>lombardo</w>
+      <w>msecs</w>
       <w>univocally</w>
       <w>wordlist</w>
     </words>
