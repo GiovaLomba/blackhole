@@ -222,7 +222,7 @@ def perform(row: str, master_pid: int) -> None:
     cmd = ' '.join(obj['command']).replace('%%', f'{row}').split()
     ret = run(cmd, stdout=PIPE, stderr=STDOUT)
 
-    if len(findall(obj['pattern'], str(ret.stdout))) > 0 and ret.check_returncode():
+    if len(findall(obj['pattern'], str(ret.stdout.decode('utf-8', errors='ignore')))) > 0 and ret.check_returncode() == 0:
         with screen_lock:
             logger.info('\n** FOUND **: \'{0}\''.format(row))
             stdout.flush()
